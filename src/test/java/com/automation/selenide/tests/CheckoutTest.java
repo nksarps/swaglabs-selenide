@@ -57,10 +57,10 @@ public class CheckoutTest extends SetUp {
      * Verifies that submitting the checkout form with missing fields shows
      * the appropriate validation error message.
      *
-     * @param firstName      first name to enter (empty string means leave blank)
-     * @param lastName       last name to enter (empty string means leave blank)
-     * @param postalCode     postal code to enter (empty string means leave blank)
-     * @param expectedError  the validation error message expected to appear
+     * @param firstName first name to enter (empty string means leave blank)
+     * @param lastName last name to enter (empty string means leave blank)
+     * @param postalCode postal code to enter (empty string means leave blank)
+     * @param expectedError the validation error message expected to appear
      */
     @ParameterizedTest(name = "{displayName} [{index}] — {3}")
     @MethodSource("checkoutFormValidationScenarios")
@@ -72,9 +72,9 @@ public class CheckoutTest extends SetUp {
         } else {
             // Fill only the provided fields then submit via enterCustomerInfo
             // We need partial submission — fill fields individually then click continue
-            if (!firstName.isEmpty())   $setField("first-name", firstName);
-            if (!lastName.isEmpty())    $setField("last-name",  lastName);
-            if (!postalCode.isEmpty())  $setField("postal-code", postalCode);
+            if (!firstName.isEmpty()) $setField("first-name", firstName);
+            if (!lastName.isEmpty()) $setField("last-name",  lastName);
+            if (!postalCode.isEmpty()) $setField("postal-code", postalCode);
             checkoutInfoPage.submitWithoutInfo();
         }
         assertTrue(checkoutInfoPage.isErrorDisplayed());
@@ -119,6 +119,31 @@ public class CheckoutTest extends SetUp {
     }
 
     /**
+     * Verifies that cancelling on the checkout info page returns the user
+     * to the cart page with the correct title.
+     */
+    @Test
+    @DisplayName("Cancel checkout returns to cart page")
+    public void cancelCheckoutReturnsToCart() {
+        checkoutInfoPage.cancelCheckout();
+        assertEquals(CheckoutData.CART_PAGE_TITLE, cartPage.getPageTitle());
+    }
+
+    /**
+     * Verifies that clicking Back to Products on the confirmation page
+     * returns the user to the inventory page with the correct title.
+     */
+    @Test
+    @DisplayName("Back to products returns to inventory page")
+    public void backToProductsReturnsToInventory() {
+        checkoutInfoPage.enterCustomerInfo(
+                CheckoutData.FIRST_NAME, CheckoutData.LAST_NAME, CheckoutData.POSTAL_CODE);
+        checkoutOverviewPage.finishOrder();
+        checkoutCompletePage.backToProducts();
+        assertEquals(ProductData.PAGE_TITLE, inventoryPage.getPageTitle());
+    }
+
+    /**
      * Provides three form validation scenarios — each omits one required field:
      * <ol>
      *   <li>Missing first name</li>
@@ -130,22 +155,18 @@ public class CheckoutTest extends SetUp {
      */
     static Stream<Arguments> checkoutFormValidationScenarios() {
         return Stream.of(
-            Arguments.of("",                    CheckoutData.LAST_NAME,   CheckoutData.POSTAL_CODE, CheckoutData.ERROR_FIRST_NAME_REQUIRED),
-            Arguments.of(CheckoutData.FIRST_NAME, "",                     CheckoutData.POSTAL_CODE, CheckoutData.ERROR_LAST_NAME_REQUIRED),
-            Arguments.of(CheckoutData.FIRST_NAME, CheckoutData.LAST_NAME, "",                       CheckoutData.ERROR_POSTAL_CODE_REQUIRED)
+            Arguments.of("", CheckoutData.LAST_NAME, CheckoutData.POSTAL_CODE, CheckoutData.ERROR_FIRST_NAME_REQUIRED),
+            Arguments.of(CheckoutData.FIRST_NAME, "", CheckoutData.POSTAL_CODE, CheckoutData.ERROR_LAST_NAME_REQUIRED),
+            Arguments.of(CheckoutData.FIRST_NAME, CheckoutData.LAST_NAME, "", CheckoutData.ERROR_POSTAL_CODE_REQUIRED)
         );
     }
-
-    // -------------------------------------------------------------------------
-    // Helper — sets a single form field by id without submitting
-    // -------------------------------------------------------------------------
 
     /**
      * Sets the value of a form field identified by its {@code id} attribute.
      * Used to partially fill the checkout form for validation testing.
      *
      * @param fieldId the HTML {@code id} of the input element
-     * @param value   the value to type into the field
+     * @param value the value to type into the field
      */
     private void $setField(String fieldId, String value) {
         com.codeborne.selenide.Selenide.$("#" + fieldId).setValue(value);
