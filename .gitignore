@@ -25,3 +25,6 @@ AI_BUILD_PROMPT.md
 PROJECT_DESCRIPTION.md
 
 # End of https://www.toptal.com/developers/gitignore/api/maven
+
+# Allure command-line tool installation
+.allure/
