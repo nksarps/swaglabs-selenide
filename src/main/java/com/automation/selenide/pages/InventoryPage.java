@@ -8,13 +8,12 @@ import static com.codeborne.selenide.Selenide.$$;
 
 /** Page object for the SauceDemo inventory page ({@code /inventory.html}). */
 public class InventoryPage {
-
-    private final SelenideElement    pageTitle        = $(".title");
-    private final ElementsCollection inventoryItems   = $$(".inventory_item");
-    private final SelenideElement    cartIcon         = $(".shopping_cart_link");
-    private final SelenideElement    cartBadge        = $(".shopping_cart_badge");
-    private final SelenideElement    burgerMenuButton = $("#react-burger-menu-btn");
-    private final SelenideElement    logoutLink       = $("#logout_sidebar_link");
+    private final SelenideElement pageTitle = $(".title");
+    private final ElementsCollection inventoryItems = $$(".inventory_item");
+    private final SelenideElement cartIcon = $(".shopping_cart_link");
+    private final SelenideElement cartBadge = $(".shopping_cart_badge");
+    private final SelenideElement burgerMenuButton = $("#react-burger-menu-btn");
+    private final SelenideElement logoutLink = $("#logout_sidebar_link");
 
     /**
      * Returns the visible page title text.
