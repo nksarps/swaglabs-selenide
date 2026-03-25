@@ -8,8 +8,8 @@ import static com.codeborne.selenide.Selenide.$$;
 
 /** Page object for the SauceDemo inventory page ({@code /inventory.html}). */
 public class InventoryPage {
-    private final SelenideElement pageTitle= $(".title");
-    private final ElementsCollection inventoryItems  = $$(".inventory_item");
+    private final SelenideElement pageTitle = $(".title");
+    private final ElementsCollection inventoryItems = $$(".inventory_item");
     private final SelenideElement cartIcon = $(".shopping_cart_link");
     private final SelenideElement cartBadge = $(".shopping_cart_badge");
     private final SelenideElement burgerMenuButton = $("#react-burger-menu-btn");
@@ -49,6 +49,18 @@ public class InventoryPage {
      */
     public void addProductToCart(String addButtonDataTest) {
         $("[data-test='" + addButtonDataTest + "']").click();
+    }
+
+    /**
+     * Checks whether the remove button for a specific product is currently displayed.
+     * Used to verify that the button state flipped from "Add to cart" to "Remove"
+     * after a product has been added.
+     *
+     * @param removeButtonDataTest the {@code data-test} attribute value of the remove button
+     * @return {@code true} if the remove button is visible
+     */
+    public boolean isRemoveButtonDisplayed(String removeButtonDataTest) {
+        return $("[data-test='" + removeButtonDataTest + "']").isDisplayed();
     }
 
     /**

@@ -24,5 +24,8 @@ buildNumber.properties
 AI_BUILD_PROMPT.md
 PROJECT_DESCRIPTION.md
 
+# Custom build files for screenshots
+build/
+
 # End of https://www.toptal.com/developers/gitignore/api/maven
 
