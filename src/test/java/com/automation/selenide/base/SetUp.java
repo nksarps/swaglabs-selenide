@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.junit.jupiter.api.extension.TestWatcher;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -91,6 +92,14 @@ public class SetUp {
 
         // Headless mode — pass -Dheadless=true to enable
         Configuration.headless = "true".equalsIgnoreCase(System.getProperty("headless", "false"));
+
+        // Add Chrome options for Docker compatibility
+        if ("chrome".equalsIgnoreCase(browser)) {
+            ChromeOptions chromeOptions = new ChromeOptions();
+            chromeOptions.addArguments("--no-sandbox");
+            chromeOptions.addArguments("--disable-dev-shm-usage");
+            Configuration.browserCapabilities = chromeOptions;
+        }
 
         Configuration.baseUrl = "https://www.saucedemo.com";
         Configuration.timeout = 10000;
