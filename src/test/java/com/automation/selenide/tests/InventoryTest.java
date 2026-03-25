@@ -86,4 +86,25 @@ public class InventoryTest extends SetUp {
         // After logout the login page is shown — error should not be displayed
         assertTrue(!loginPage.isErrorDisplayed());
     }
+
+    /**
+     * Verifies that the cart badge is not displayed before any product is added.
+     * Covers the initial empty-cart state on page load.
+     */
+    @Test
+    @DisplayName("Cart badge not displayed initially")
+    public void cartBadgeNotDisplayedInitially() {
+        assertTrue(!inventoryPage.isCartBadgeDisplayed());
+    }
+
+    /**
+     * Verifies that adding a product flips the button state from
+     * "Add to cart" to "Remove" for that product.
+     */
+    @Test
+    @DisplayName("Adding a product shows the remove button")
+    public void addingProductShowsRemoveButton() {
+        inventoryPage.addProductToCart(ProductData.ADD_BACKPACK);
+        assertTrue(inventoryPage.isRemoveButtonDisplayed(ProductData.REMOVE_BACKPACK));
+    }
 }
