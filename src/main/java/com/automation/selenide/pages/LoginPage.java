@@ -8,8 +8,8 @@ import static com.codeborne.selenide.Selenide.$;
 public class LoginPage {
     private final SelenideElement usernameField = $("#user-name");
     private final SelenideElement passwordField = $("#password");
-    private final SelenideElement loginButton   = $("#login-button");
-    private final SelenideElement errorMessage  = $("[data-test='error']");
+    private final SelenideElement loginButton = $("#login-button");
+    private final SelenideElement errorMessage = $("[data-test='error']");
 
     /**
      * Enters credentials into the login form and submits it.
