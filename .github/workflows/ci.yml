@@ -1,0 +1,162 @@
+name: SwagLabs CI
+
+on:
+  push:
+    branches: [main, develop, feature/*]
+  pull_request:
+    branches: [main, develop, feature/*]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: docker build -t swaglabs-tests .
+
+      - name: Run tests in container
+        id: run_tests
+        run: |
+          docker run --rm \
+            --shm-size=2g \
+            -v ${{ github.workspace }}/target:/app/target \
+            --entrypoint bash \
+            swaglabs-tests \
+            -c "mvn -B test -Dheadless=true -DtrimStackTrace=false -Dsurefire.printSummary=true"
+
+      - name: Generate Allure report
+        if: always()
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/target:/app/target \
+            --entrypoint bash \
+            swaglabs-tests \
+            -c "mvn allure:report"
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: target/site/allure-maven-plugin
+
+      - name: Deploy Allure report to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: target/site/allure-maven-plugin
+          destination_dir: ${{ github.run_number }}
+
+      - name: Set Allure report URL as summary
+        if: always()
+        run: |
+          echo "### 📊 Allure Report" >> $GITHUB_STEP_SUMMARY
+          echo "[View Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }})" >> $GITHUB_STEP_SUMMARY
+
+      - name: Extract test results
+        if: always()
+        id: test_results
+        run: |
+          COMMIT_SHA=${GITHUB_SHA:0:7}
+          TOTAL=0
+          FAILED=0
+          SKIPPED=0
+
+          if ls target/surefire-reports/*.txt >/dev/null 2>&1; then
+            while read -r line; do
+              RUN=$(echo "$line" | sed -n 's/.*Tests run: \([0-9]*\).*/\1/p')
+              FAIL=$(echo "$line" | sed -n 's/.*Failures: \([0-9]*\).*/\1/p')
+              ERR=$(echo "$line" | sed -n 's/.*Errors: \([0-9]*\).*/\1/p')
+              SKIP=$(echo "$line" | sed -n 's/.*Skipped: \([0-9]*\).*/\1/p')
+              if [ -n "$RUN" ]; then
+                TOTAL=$((TOTAL + RUN))
+                FAILED=$((FAILED + FAIL + ERR))
+                SKIPPED=$((SKIPPED + SKIP))
+              fi
+            done < <(grep -h "Tests run:" target/surefire-reports/*.txt || true)
+          fi
+
+          PASSED=$((TOTAL - FAILED - SKIPPED))
+
+          # Extract failing test names using [FAIL] marker from surefire XML reports (system-err)
+          FAILING_TESTS_RAW=$(grep -oh '\[FAIL\][^<]*' target/surefire-reports/TEST-*.xml 2>/dev/null \
+            | sed 's/ ==>.*//' \
+            | sort -u || true)
+
+          # Escape newlines for JSON payload (replace newline with literal \n)
+          FAILING_TESTS_JSON=$(echo "$FAILING_TESTS_RAW" | sed ':a;N;$!ba;s/\n/\\n/g')
+
+          echo "commit_sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
+          echo "failing_tests_raw<<EOF" >> $GITHUB_OUTPUT
+          echo "$FAILING_TESTS_RAW" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "failing_tests_json<<EOF" >> $GITHUB_OUTPUT
+          echo "$FAILING_TESTS_JSON" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports
+
+      - name: Slack notify
+        if: always()
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "text": "${{ job.status == 'success' && '✅ *CI Pipeline Passed*' || '🚨 *CI Pipeline Failed*' }}\n\n📦 *Repository:* ${{ github.repository }}\n🌿 *Branch:* ${{ github.ref_name }}\n🧾 *Commit:* ${{ steps.test_results.outputs.commit_sha }}\n📊 *Status:* ${{ job.status == 'success' && '✅ PASSED' || '❌ FAILED' }}\n\n━━━━━━━━━━━━━━━━━━\n📈 *Test Summary*\n• Total Tests: ${{ steps.test_results.outputs.total }}\n• Failed: ${{ steps.test_results.outputs.failed }} ${{ job.status == 'success' && '' || '❌' }}\n• Skipped: ${{ steps.test_results.outputs.skipped }}\n━━━━━━━━━━━━━━━━━━\n\n${{ job.status == 'success' && '✅ *All Tests Passed*' || format('🔴 *Failing Tests*\n{0}', steps.test_results.outputs.failing_tests_json) }}\n\n🔗 *Run Details:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n📊 *Allure Report:* https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Email notify
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "CI ${{ job.status == 'success' && '✅ PASSED' || '❌ FAILED' }}: ${{ github.repository }}"
+          to: ${{ secrets.NOTIFY_EMAIL_TO }}
+          from: ${{ secrets.NOTIFY_EMAIL_FROM }}
+          body: |
+            ${{ job.status == 'success' && '✅ CI Pipeline Passed' || '🚨 CI Pipeline Failed' }}
+
+            📦 Repository: ${{ github.repository }}
+            🌿 Branch:     ${{ github.ref_name }}
+            🧾 Commit:     ${{ steps.test_results.outputs.commit_sha }}
+            📊 Status:     ${{ job.status == 'success' && '✅ PASSED' || '❌ FAILED' }}
+
+            ━━━━━━━━━━━━━━━━━━
+            📈 Test Summary
+            • Total Tests: ${{ steps.test_results.outputs.total }}
+            • Passed:      ${{ steps.test_results.outputs.passed }}
+            • Failed:      ${{ steps.test_results.outputs.failed }}
+            • Skipped:     ${{ steps.test_results.outputs.skipped }}
+            ━━━━━━━━━━━━━━━━━━
+
+            ${{ job.status == 'success' && '✅ All Tests Passed' || '🔴 Failing Tests:' }}
+            ${{ job.status == 'success' && '' || steps.test_results.outputs.failing_tests_raw }}
+
+            🔗 Run Details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            📊 Allure Report: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}
