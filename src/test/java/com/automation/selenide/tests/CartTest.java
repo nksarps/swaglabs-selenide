@@ -73,4 +73,15 @@ public class CartTest extends SetUp {
         cartPage.proceedToCheckout();
         assertEquals(CheckoutData.INFO_PAGE_TITLE, checkoutInfoPage.getPageTitle());
     }
+
+    /**
+     * Verifies that clicking Continue Shopping from the cart returns the user
+     * to the inventory page with the correct title.
+     */
+    @Test
+    @DisplayName("Continue shopping returns to inventory page")
+    public void continueShoppingReturnsToInventory() {
+        cartPage.continueShopping();
+        assertEquals(ProductData.PAGE_TITLE, inventoryPage.getPageTitle());
+    }
 }
