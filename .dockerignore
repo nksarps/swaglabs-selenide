@@ -1,0 +1,31 @@
+# Maven build output
+target/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Git
+.git/
+.gitignore
+
+# Documentation and project files
+README.md
+AI_BUILD_PROMPT.md
+PROJECT_DESCRIPTION.md
+
+# Docker files (no need to copy into the image)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Allure CLI (if bundled locally)
+.allure/
