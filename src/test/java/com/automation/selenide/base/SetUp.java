@@ -8,13 +8,16 @@ import com.automation.selenide.pages.InventoryPage;
 import com.automation.selenide.pages.LoginPage;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.WebDriverRunner;
 import com.codeborne.selenide.logevents.SelenideLogger;
+import io.qameta.allure.Attachment;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.junit.jupiter.api.extension.TestWatcher;
 
 import java.io.InputStream;
@@ -41,7 +44,7 @@ import static com.codeborne.selenide.Selenide.open;
  * </ul>
  * </p>
  */
-@ExtendWith(SetUp.JulTestWatcher.class)
+@ExtendWith({SetUp.JulTestWatcher.class, SetUp.ScreenshotOnFailureExtension.class})
 public class SetUp {
     static {
         try {
@@ -92,10 +95,13 @@ public class SetUp {
         Configuration.baseUrl = "https://www.saucedemo.com";
         Configuration.timeout = 10000;
 
-        // Register Allure listener — captures screenshot + page source on failure
-        SelenideLogger.addListener("allure", new AllureSelenide()
-                .screenshots(true)
-                .savePageSource(true));
+        // Register Allure listener — captures screenshot + page source on failure.
+        // Guard against duplicate registration across tests in the same JVM.
+        if (!SelenideLogger.hasListener("allure")) {
+            SelenideLogger.addListener("allure", new AllureSelenide()
+                    .screenshots(true)
+                    .savePageSource(true));
+        }
 
         // Open the base URL in a fresh browser instance
         open("/");
@@ -117,7 +123,7 @@ public class SetUp {
     public void tearDown() {
         Selenide.closeWebDriver();
     }
-    
+
 
     /**
      * JUnit 5 {@link TestWatcher} that logs a one-line result marker to the
@@ -163,6 +169,43 @@ public class SetUp {
         @Override
         public void testDisabled(ExtensionContext context, java.util.Optional<String> reason) {
             log.info("[SKIP] " + context.getDisplayName());
+        }
+    }
+
+    /**
+     * JUnit 5 extension that captures a screenshot at the moment a test throws an exception.
+     * This runs before {@code @AfterEach}, so the browser is still open.
+     */
+    public static class ScreenshotOnFailureExtension implements TestExecutionExceptionHandler {
+
+        @Override
+        public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
+            // Capture screenshot immediately when test fails, before @AfterEach closes browser
+            try {
+                captureScreenshot();
+            } catch (Exception e) {
+                // Screenshot capture failed — log and continue with test failure
+                System.err.println("Failed to capture screenshot: " + e.getMessage());
+            }
+            // Re-throw the original exception so the test still fails
+            throw throwable;
+        }
+
+        @Attachment(value = "Screenshot on failure", type = "image/png")
+        private byte[] captureScreenshot() {
+            try {
+                // Use WebDriver's TakesScreenshot interface directly
+                org.openqa.selenium.WebDriver driver = WebDriverRunner.getWebDriver();
+                if (driver instanceof org.openqa.selenium.TakesScreenshot) {
+                    return ((org.openqa.selenium.TakesScreenshot) driver)
+                            .getScreenshotAs(org.openqa.selenium.OutputType.BYTES);
+                }
+                System.err.println("WebDriver does not support screenshots");
+            } catch (Exception e) {
+                System.err.println("Screenshot capture exception: " + e.getMessage());
+                e.printStackTrace();
+            }
+            return null; 
         }
     }
 }
