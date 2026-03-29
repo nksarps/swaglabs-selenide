@@ -27,5 +27,8 @@ PROJECT_DESCRIPTION.md
 # Custom build files for screenshots
 build/
 
+# IntelliJ IDEA
+.idea/
+
 # End of https://www.toptal.com/developers/gitignore/api/maven
 
