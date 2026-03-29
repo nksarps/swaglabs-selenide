@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Tag("regression")
 @DisplayName("Cart Tests")
 public class CartTest extends SetUp {
-
     /**
      * Logs in as the standard user, adds the backpack to the cart,
      * and navigates to the cart page before each test.

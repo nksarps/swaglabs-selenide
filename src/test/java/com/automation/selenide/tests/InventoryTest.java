@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Smoke tests for the SauceDemo inventory (products) page.
@@ -22,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("smoke")
 @DisplayName("Inventory Tests")
 public class InventoryTest extends SetUp {
-
     /**
      * Logs in as the standard user before each test so all inventory
      * tests start from the products page.
@@ -84,7 +82,7 @@ public class InventoryTest extends SetUp {
     public void userCanLogout() {
         inventoryPage.logout();
         // After logout the login page is shown — error should not be displayed
-        assertTrue(!loginPage.isErrorDisplayed());
+        assertFalse(loginPage.isErrorDisplayed());
     }
 
     /**
@@ -94,7 +92,7 @@ public class InventoryTest extends SetUp {
     @Test
     @DisplayName("Cart badge not displayed initially")
     public void cartBadgeNotDisplayedInitially() {
-        assertTrue(!inventoryPage.isCartBadgeDisplayed());
+        assertFalse(inventoryPage.isCartBadgeDisplayed());
     }
 
     /**

@@ -8,7 +8,6 @@ import static com.codeborne.selenide.Selenide.$;
 public class CheckoutCompletePage {
     private final SelenideElement pageTitle = $(".title");
     private final SelenideElement confirmationHeader = $(".complete-header");
-    private final SelenideElement confirmationText = $(".complete-text");
     private final SelenideElement backToProductsButton = $("[data-test='back-to-products']");
 
     /**
@@ -27,15 +26,6 @@ public class CheckoutCompletePage {
      */
     public String getConfirmationHeader() {
         return confirmationHeader.getText();
-    }
-
-    /**
-     * Returns the confirmation body text displayed below the header.
-     *
-     * @return confirmation text string
-     */
-    public String getConfirmationText() {
-        return confirmationText.getText();
     }
 
     /**

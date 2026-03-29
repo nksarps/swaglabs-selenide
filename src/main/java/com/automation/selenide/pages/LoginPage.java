@@ -24,17 +24,6 @@ public class LoginPage {
     }
 
     /**
-     * Attempts a login expected to fail (e.g. invalid credentials).
-     * Delegates to {@link #login(String, String)}.
-     *
-     * @param username the account username
-     * @param password the account password
-     */
-    public void loginExpectingFailure(String username, String password) {
-        login(username, password);
-    }
-
-    /**
      * Returns the error message text shown after a failed login attempt.
      *
      * @return error message string

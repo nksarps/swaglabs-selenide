@@ -48,7 +48,7 @@ public class LoginTest extends SetUp {
     @MethodSource("invalidLoginScenarios")
     @DisplayName("Invalid login shows error message")
     public void invalidLoginShowsError(String username, String password, String expectedError) {
-        loginPage.loginExpectingFailure(username, password);
+        loginPage.login(username, password);
         assertTrue(loginPage.isErrorDisplayed());
         assertEquals(expectedError, loginPage.getErrorMessage());
     }
