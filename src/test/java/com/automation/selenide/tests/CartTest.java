@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -16,21 +15,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Regression tests for the SauceDemo cart page.
  * <p>
  * Each test starts with the standard user logged in, the backpack added to
- * the cart, and the cart page open — set up via {@link #loginAndAddProduct(TestInfo)}.
+ * the cart, and the cart page open — set up via {@link #loginAndAddProduct()}.
  * </p>
  */
 @Tag("regression")
 @DisplayName("Cart Tests")
 public class CartTest extends SetUp {
-
     /**
      * Logs in as the standard user, adds the backpack to the cart,
      * and navigates to the cart page before each test.
-     *
-     * @param testInfo JUnit 5 injected test metadata
      */
     @BeforeEach
-    public void loginAndAddProduct(TestInfo testInfo) {
+    public void loginAndAddProduct() {
         loginPage.login(LoginData.STANDARD_USER, LoginData.PASSWORD);
         inventoryPage.addProductToCart(ProductData.ADD_BACKPACK);
         inventoryPage.goToCart();

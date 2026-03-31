@@ -81,11 +81,9 @@ public class SetUp {
      * Configures Selenide, registers the Allure listener, opens the base URL,
      * and instantiates all page objects.
      * </p>
-     *
-     * @param testInfo JUnit 5 injected metadata (unused here, available to subclasses)
      */
     @BeforeEach
-    public void setUp(TestInfo testInfo) {
+    public void setUp() {
         // Browser selection — defaults to Chrome; pass -Dbrowser=firefox to switch
         String browser = System.getProperty("browser", "chrome");
         Configuration.browser = browser;

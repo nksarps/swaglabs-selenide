@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -23,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>
  * Each test starts with the standard user logged in, the backpack added,
  * and the checkout information page open — set up via
- * {@link #loginAddProductAndProceedToCheckout(TestInfo)}.
+ * {@link #loginAddProductAndProceedToCheckout()}.
  * </p>
  */
 @Tag("regression")
@@ -33,11 +32,9 @@ public class CheckoutTest extends SetUp {
     /**
      * Logs in, adds the backpack, navigates to the cart, and proceeds to
      * the checkout information page before each test.
-     *
-     * @param testInfo JUnit 5 injected test metadata
      */
     @BeforeEach
-    public void loginAddProductAndProceedToCheckout(TestInfo testInfo) {
+    public void loginAddProductAndProceedToCheckout() {
         loginPage.login(LoginData.STANDARD_USER, LoginData.PASSWORD);
         inventoryPage.addProductToCart(ProductData.ADD_BACKPACK);
         inventoryPage.goToCart();
