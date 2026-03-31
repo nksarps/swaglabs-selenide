@@ -16,19 +16,6 @@ public class LoginData {
     /** Standard user — full access, no quirks. Used as the default test account. */
     public static final String STANDARD_USER = "standard_user";
 
-    /** Problem user — images and interactions are intentionally broken. */
-    public static final String PROBLEM_USER = "problem_user";
-
-    /** Performance glitch user — simulates slow page loads. */
-    public static final String PERFORMANCE_USER = "performance_glitch_user";
-
-    /** Error user — certain actions trigger server-side errors. */
-    public static final String ERROR_USER = "error_user";
-
-    /** Visual user — UI has intentional visual defects. */
-    public static final String VISUAL_USER = "visual_user";
-
-
     // Invalid / restricted usernames
     /** Locked-out user — valid credentials but access is denied by the app. */
     public static final String LOCKED_OUT_USER = "locked_out_user";

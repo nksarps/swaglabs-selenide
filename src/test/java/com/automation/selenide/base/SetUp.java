@@ -29,20 +29,6 @@ import static com.codeborne.selenide.Selenide.open;
 
 /**
  * Base class for all test classes.
- * <p>
- * Responsibilities:
- * <ul>
- *   <li>Configures JUL logging via {@code logging.properties} on class load.</li>
- *   <li>Configures Selenide ({@code browser}, {@code headless}, {@code baseUrl}, {@code timeout})
- *       before each test via {@link #setUp()}.</li>
- *   <li>Registers the {@link AllureSelenide} listener for automatic screenshot and
- *       page-source capture on failure.</li>
- *   <li>Instantiates all six page objects before each test.</li>
- *   <li>Closes the browser after each test via {@link #tearDown()}.</li>
- *   <li>Logs {@code [PASS]}, {@code [FAIL]}, and {@code [SKIP]} markers to the
- *       console through the inner {@link JulTestWatcher}.</li>
- * </ul>
- * </p>
  */
 @ExtendWith({SetUp.JulTestWatcher.class, SetUp.ScreenshotOnFailureExtension.class})
 public class SetUp {
@@ -80,6 +66,7 @@ public class SetUp {
      * Configures Selenide, registers the Allure listener, opens the base URL,
      * and instantiates all page objects.
      * </p>
+     *
      */
     @BeforeEach
     public void setUp() {
@@ -211,7 +198,7 @@ public class SetUp {
                 System.err.println("Screenshot capture exception: " + e.getMessage());
                 e.printStackTrace();
             }
-            return null; 
+            return null;
         }
     }
 }

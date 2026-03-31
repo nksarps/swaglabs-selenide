@@ -23,15 +23,6 @@ public class CartPage {
     }
 
     /**
-     * Returns all cart item elements currently listed in the cart.
-     *
-     * @return collection of cart item elements
-     */
-    public ElementsCollection getCartItems() {
-        return cartItems;
-    }
-
-    /**
      * Returns the number of items currently in the cart.
      *
      * @return cart item count

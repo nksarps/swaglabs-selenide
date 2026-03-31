@@ -25,15 +25,6 @@ public class InventoryPage {
     }
 
     /**
-     * Returns all product item elements on the inventory page.
-     *
-     * @return collection of inventory item elements
-     */
-    public ElementsCollection getAllProducts() {
-        return inventoryItems;
-    }
-
-    /**
      * Returns the total number of products displayed on the page.
      *
      * @return product count

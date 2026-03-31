@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("regression")
 @DisplayName("Checkout Tests")
 public class CheckoutTest extends SetUp {
-
     /**
      * Logs in, adds the backpack, navigates to the cart, and proceeds to
      * the checkout information page before each test.
