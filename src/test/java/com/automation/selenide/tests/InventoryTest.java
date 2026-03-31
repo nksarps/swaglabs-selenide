@@ -7,14 +7,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Smoke tests for the SauceDemo inventory (products) page.
  * <p>
- * Each test logs in as the standard user before execution via {@link #login(TestInfo)}.
+ * Each test logs in as the standard user before execution via {@link #login()}.
  * Covers page title, product count, cart badge behaviour, and logout.
  * </p>
  */
@@ -24,11 +23,9 @@ public class InventoryTest extends SetUp {
     /**
      * Logs in as the standard user before each test so all inventory
      * tests start from the products page.
-     *
-     * @param testInfo JUnit 5 injected test metadata (passed to parent setUp)
      */
     @BeforeEach
-    public void login(TestInfo testInfo) {
+    public void login() {
         loginPage.login(LoginData.STANDARD_USER, LoginData.PASSWORD);
     }
 
