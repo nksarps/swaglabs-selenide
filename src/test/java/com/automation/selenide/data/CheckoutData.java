@@ -23,10 +23,10 @@ public class CheckoutData {
     public static final String CART_PAGE_TITLE = "Your Cart";
 
     /** Page title displayed on the checkout information step. */
-    public static final String INFO_PAGE_TITLE = "Checkout: Your Information";
+    public static final String INFO_PAGE_TITLE = "Checkout:Your Information";
 
     /** Page title displayed on the checkout overview step. */
-    public static final String OVERVIEW_PAGE_TITLE = "Checkout: Overview";
+    public static final String OVERVIEW_PAGE_TITLE = "Checkout:Overview";
 
     /** Page title displayed on the checkout complete step. */
     public static final String COMPLETE_PAGE_TITLE = "Checkout: Complete!";
